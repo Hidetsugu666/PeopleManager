@@ -1,27 +1,40 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 using PeopleManager.Model;
 
 namespace PeopleManager.Core
 {
-    public class PeopleManagerDbContext(DbContextOptions<PeopleManagerDbContext> options) : DbContext(options)
+    public class PeopleManagerDbContext(DbContextOptions<PeopleManagerDbContext> options) : IdentityDbContext(options)
     {
+         
         public DbSet<Organization> Organizations => Set<Organization>();
         public DbSet<Person> People => Set<Person>();
 
         public void Seed()
         {
+            var userEmail = "test@user.be";
+            var testUser = new IdentityUser()
+            {
+                UserName = userEmail,
+                NormalizedUserName = userEmail.ToUpper(),
+                Email = userEmail,
+                NormalizedEmail = userEmail.ToUpper(),
+                PasswordHash = "AQAAAAIAAYagAAAAEFD8je85ksLFl+cBf3fcROhlhqQwdRpJGraHmc5y11ypnMuy5OHsggYKWg2LtgeJtg==" //Test123$
+            };
+            Users.Add(testUser);
+
             var vivesOrganization = new Organization
             {
                 Name = "Vives University College"
             };
             Organizations.Add(vivesOrganization);
-
             var youthOrganisation = new Organization
             {
                 Name = "Young Blood Youth Group"
             };
             Organizations.Add(youthOrganisation);
-
             var people = new List<Person>
             {
                 new Person { FirstName = "John", LastName = "Doe", Email = "john.doe@example.com", Organization = youthOrganisation},
@@ -45,9 +58,7 @@ namespace PeopleManager.Core
                 new Person { FirstName = "Harper", LastName = "Martinez", Organization = vivesOrganization },
                 new Person { FirstName = "Lucas", LastName = "Robinson", Email = "lucas.robinson@example.com", Organization = youthOrganisation }
             };
-
             People.AddRange(people);
-
             SaveChanges();
         }
     }
